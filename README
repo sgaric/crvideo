@@ -1,5 +1,128 @@
 INTRODUCTION
 ------------
 
-This package was developed to find and copy "mp4" files cached by DivX Web
-Player when streaming online content.
+This package was developed to find and copy "mp4" and "mkv" files cached by 
+DivX Web Player when streaming online content. The application itself is not 
+too complex too use and as a result may look even too simple for some.
+
+Don't be mistaked though, it does exactly what it says it does and does it in
+a simple and easy to understand way.
+
+INSTALLATION
+------------
+
+a) Source Installation
+Source installation is a bit complex and is not really recommended unless
+you know what you are doing and are willing to go through setting up some
+development environment first.
+
+   i) Dependenceis
+	 - Qt Framework
+	 - PyQt API Framework
+	 - Python 2.7 (did not test it on earlier or later version but there should
+	   be no reason why this source wouldn't work with Python 2.6 or newer)
+	 - py2app - only required if you intend to build a stand alone application
+	   yourself
+	 - macports - same reason as for py2app
+	 
+	 PY2APP has some issues when trying to create a standalone Mac OS X app.
+	 Major problem happens if you try to use the default Python Framework to
+	 create an application as for some reason default framework does not 
+	 deal with library dependencies properly. Libaries are not included in
+	 the resulting Application making it impossible to distribute them to 
+	 people that do not want to install every single dependency themselves,
+	 which in my opinion is very much valid choice.
+	 
+	 However, custom built Python Frameworks (don't mistake this with custom
+	 build Python installation from source) do not have this problem and I
+	 have opted for 'macports' and I used macports v2.0.4.
+	 
+	 There are a number of ports that you will need to install into macports but
+	 here are few that I used to create my own development environment. Next to
+	 each port there is a command to install it into macports and that command
+	 assumes you have a right to write into macports directory. If not, you can
+	 prepend 'sudo' to the command if you have sudo access on your system:
+	 * python27         -   port install python27
+	 * py27-macholib    -   port install py27-macholib
+	 * py27-sip         -   port install py27-sip
+	 * py27-pyqt4       -   port install py27-pyqt4
+	 * py27-py2app      -   port install py27-py2app
+	 * py27-pyqt        -   port -v install py27-pyqt    (used verbose option here)
+	 * python_select    -   port install python_select
+	
+	After this all you have to do is go to the source directory of this package
+	and run: 'python crvideo.pyw' to run your application
+	
+	
+b) Distribution Installation
+
+   Very simple:
+    i) download 'crvideo.app' from this github repository
+   ii) Copy it to whatever destination you want on your system
+       - You can drag it onto your Dock as well
+   
+   That is it. Launch it as you would any other application
+   
+
+DOCUMENTATION
+-------------
+
+a) Configuration
+   This application uses a configuration which is stored in $HOME/.crvideo JSON file.
+   You do not have to create it, it will be created first time the application is
+   launched with default values. However, every time you change the configuration
+   that file will get updated. You can if you wish modify the file manuall, but you
+   will have to adhere to the syntax for the application to work.
+   
+   '.crvideo' file is of the following form:
+{
+	"sourcedirs": [
+	"/private/var/folders",
+	"/opt/local/divxcache"
+ 	], 
+ 	"destdir": "/Users/slavisa/Movies/CRVideo"
+}
+   It only has two 'keys':
+   * sourcedirs - the value for this data structure has to be a list of all the
+   directories you want this application to search for MP4 or MKV files. List is
+   enclosed in a pair of square brackets ([]) and individual directories are separated
+   by a comma. In the example above, "/private/var/folders" is a valid directory, at
+   least on my machine, but the "/opt/local/divxcache" is just made up for
+   demonstration purposes.
+   
+   * destdir - the value for this data structure is a single directory indicating
+   where you want to save the files that this application found.
+   
+
+b) Using CRVIDEO
+   When you launch the application you will be presented with a simple Dialog like
+   application interfaces. On launch, CRVIDEO will perform a search using either
+   current configuration you have or default configuration if the former is missing.
+   
+   The main portion of the application window will contain a list view of all the 
+   files that the application found. Next to that list you will have a number of 
+   buttons:
+   i)   Copy - copy the file to your destination folder
+   ii)  Move - move the file to your destination folder
+   iii) Config - Launch the configuration dialog where you can change your source
+        destination folder options
+        
+   -- Configuration Dialog --
+   This part of the application warrants a little mention here. This Dialog interface
+   allows you to modify the current configuration for CRVIDEO. It allows you to add
+   new directory to the current list of source directories and it allows you to change
+   where you want your files saved.
+   
+   I think the interface will be self explanatory but I will quickly mention just one
+   thing. Each time you modify the configuration it will be automatically saved only
+   when you press 'OK' button in the configuration window. Canceling will cancel every
+   modification.
+   
+
+Contact
+-------
+If you would like any other information please just contact me at:
+sgaric@gmail.com
+
+Regards
+   
