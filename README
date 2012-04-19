@@ -56,10 +56,11 @@ development environment first.
 	
 b) Distribution Installation
 
-   The only bad thing about this is the size of the actual application. Unfortunately
-   not much could have been done to reduce the size of this because it was the first
-   time I developed in PyQt and distribution needed to be standalone. Might tweek 
-   this at a later stage to not include libraries not used by this application.
+   The only bad thing about this is the size of the actual application. 
+   Unfortunately not much could have been done to reduce the size of this 
+   because it was the first time I developed in PyQt and distribution needed to
+   be standalone. Might tweek this at a later stage to not include libraries 
+   not used by this application.
 
    Very simple:
     i) download 'crvideo.app' from this github repository
