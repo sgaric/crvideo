@@ -5,7 +5,7 @@ This package was developed to find and copy "mp4" and "mkv" files cached by
 DivX Web Player when streaming online content. The application itself is not 
 too complex too use and as a result may look even too simple for some.
 
-Don't be mistaked though, it does exactly what it says it does and does it in
+Don't be mistaken though, it does exactly what it says it does and does it in
 a simple and easy to understand way.
 
 INSTALLATION
@@ -55,6 +55,11 @@ development environment first.
 	
 	
 b) Distribution Installation
+
+   Note: The crvideo.app was built on OS X 10.6.8 and has been tested 
+   successfully on a number of 10.6.8 machines that did not have the build
+   environment setup. I cannot guarantee however that this will work
+   on earlier versions of OS X.
 
    The only bad thing about this is the size of the actual application. 
    Unfortunately not much could have been done to reduce the size of this 
