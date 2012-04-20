@@ -56,10 +56,10 @@ development environment first.
 	
 b) Distribution Installation
 
-   Note: The crvideo.app was built on OS X 10.6.8 and has been tested 
-   successfully on a number of 10.6.8 machines that did not have the build
-   environment setup. I cannot guarantee however that this will work
-   on earlier versions of OS X.
+   Note: The crvideo.app was built on OS X 10.6.8 (Snow Leopard) and has 
+   been tested successfully on a number of 10.6.8 machines that did not 
+   have the build environment setup. However, I cannot guarantee that this 
+   will work on Leopard or Lion versions of OS X.
 
    The only bad thing about this is the size of the actual application. 
    Unfortunately not much could have been done to reduce the size of this 
