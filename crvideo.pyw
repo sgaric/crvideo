@@ -1,3 +1,4 @@
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 ####################################################################
 #    
 #    CRVIDEO Application - Find and copy mp4 and mkv files hidden in private folders
@@ -19,13 +20,20 @@
 #
 ####################################################################
 
-import subprocess, json
-import sys, os, shutil, errno
+import subprocess
+import json
+
+import sys
+import os
+import shutil
+import errno
+import time
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from crconfig import CRConfiguration
 from crconfigdialog import ConfigDialog
+from crcopyCFEdialog import MapShownameDialog
 
 MAC = "qt_mac_set_native_menubar" in dir()
 
@@ -72,6 +80,10 @@ class CRVideoDialog(QDialog):
         destfiles = glob.glob(os.path.join(self.configObj.getdestination(), '*.mkv'))
         for dfile in destfiles:
             self.destfiles.append(os.path.basename(dfile))
+        
+        destfiles = glob.glob(os.path.join(self.configObj.getdestination(), '*.cfE'))
+        for dfile in destfiles:
+            self.destfiles.append(os.path.basename(dfile))
          
     def search(self): # Idea taken from the Python Cookbook
         output = ''
@@ -79,7 +91,7 @@ class CRVideoDialog(QDialog):
         self.listWidget.clear()
         self.files = {}
         for source in self.configObj.getsources():
-            args = ['/usr/bin/find', source, '-iname', "*.mp4*"]
+            args = ['/usr/bin/find', source, '-iname', "*.[cm][pkf][4vE]"]
             try:
                 p = subprocess.Popen(args, stdout=subprocess.PIPE, 
                         stderr=subprocess.PIPE, shell=False)
@@ -92,10 +104,26 @@ class CRVideoDialog(QDialog):
             
             for line in lines:
                 if (len(searchfor) == 0 or (line.lower().find(searchfor.lower()) >= 0)) and \
-                    line.endswith('.mp4'):
+                    (line.endswith('.mp4') or line.endswith('.mkv') or line.endswith('.cfE')):
                     if os.path.basename(line) not in self.destfiles:
-                        self.files[os.path.basename(line)] = line
-            
+                        llabel = time.strftime("Created_%Y-%m-%d_%I-%M%p", time.localtime(os.path.getctime(line)))
+                        appendOriginalName = True
+                        if line.endswith(".cfE"):
+                            parts = os.path.basename(line).split(".")
+                            key = parts[0]
+                            if len(parts) > 3:
+                                key = '.'.join(parts[0:2])
+                            value = self.configObj.getmapping(key)
+                            if value is not None:
+                                llabel = value + "_" + llabel
+                                appendOriginalName = False
+                                    
+                        if appendOriginalName:
+                            llabel = os.path.basename(line) + "_" + llabel
+
+                        if llabel + ".mp4" not in self.destfiles:
+                            self.files[llabel] = line
+        
         self.listWidget.addItems(self.files.keys())
         self.listWidget.setMinimumWidth(self.listWidget.sizeHintForColumn(0)+5)
         self.listWidget.setMaximumHeight(130)
@@ -103,18 +131,69 @@ class CRVideoDialog(QDialog):
         
     def copy(self):
         for item in self.listWidget.selectedItems():
-            shutil.copy(self.files[str(item.text())], 
-                    os.path.join(self.configObj.getdestination(), str(item.text())))
+            move = False
+            destination = str(item.text())
+            if self.files[str(item.text())].endswith(".cfE"):
+                destination = self.getFilenameForCFE(item)
+                move = True
+            
+            if move:
+                shutil.move(self.files[str(item.text())], 
+                    os.path.join(self.configObj.getdestination(), destination))
+            else:
+                shutil.copy(self.files[str(item.text())], 
+                    os.path.join(self.configObj.getdestination(), destination))
             self.listWidget.takeItem(self.listWidget.row(item))
+
             del item
             
     def move(self):
         for item in self.listWidget.selectedItems():
+            destination = str(item.text())
+            if self.files[str(item.text())].endswith(".cfE"):
+                destination = self.getFilenameForCFE(item)
+
             shutil.move(self.files[str(item.text())], 
-                    os.path.join(self.configObj.getdestination(), str(item.text())))
+                    os.path.join(self.configObj.getdestination(), destination))
             self.listWidget.takeItem(self.listWidget.row(item))
             del item
-    
+
+    def getFilenameForCFE(self, item):
+        destination = str(item.text()) + ".mp4"
+        parts = os.path.basename(self.files[str(item.text())]).split(".")
+        key = parts[0]
+        if len(parts) > 3:
+            key = '.'.join(parts[0:2])
+        value = self.configObj.getmapping(key)
+
+        dialog = MapShownameDialog()
+        if value is not None:
+            dialog.setshowname(value)
+            dialog.disableShownameQLineEdit()
+                
+        if dialog.exec_():
+            #should again raise error message
+            showname = dialog.getshowname()
+            episode = dialog.getepisode()
+            season = dialog.getseason()
+
+            llabel = ''
+            if len(episode) == 0 and len(season) == 0:
+                llabel = time.strftime("_Created_%Y-%m-%d_%I-%M%p", time.localtime(os.path.getctime(self.files[str(item.text())])))
+            else:
+                if len(season) > 0:
+                    llabel = llabel + "S" + season
+                if len(episode) > 0:
+                    llabel = llabel + "E" + episode
+                            
+            destination = showname + llabel + ".mp4"
+
+            print destination
+            self.configObj.setmapping(key, showname)
+            self.configObj.storeconfig()
+        
+        return destination
+
     def config(self):
         dialog = ConfigDialog()
         if dialog.exec_():

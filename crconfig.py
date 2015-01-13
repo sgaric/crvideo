@@ -1,3 +1,4 @@
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 ####################################################################
 #    
 #    CRVIDEO Application - Find and copy mp4 and mkv files hidden in private folders
@@ -25,13 +26,15 @@ from PyQt4.QtGui import *
 
 class CRConfiguration(QDialog):
     defaultconfig = { u'sourcedirs': set((u'/private/var/folders',)), 
-                     u'destdir': u'/Users/account/Movies/CRVideo'}
+                     u'destdir': u'/Users/account/Movies/CRVideo',
+                     u'mappings': {}}
     defaultconfigfile = '/Users/account/.crvideo'
     
     def __init__(self, parent=None):
         super(CRConfiguration, self).__init__(parent)
         self.sourcedirs = set(())
         self.destdir = ''
+        self.mappings = {}
         self.setdefaultconfig()
     
     def setdefaultconfig(self):
@@ -51,15 +54,19 @@ class CRConfiguration(QDialog):
             fp = open(CRConfiguration.defaultconfigfile, 'rb')
             config = json.load(fp)
             fp.close()
-            
+           
             self.sourcedirs = set(config[u'sourcedirs'])
             self.destdir = config[u'destdir']
             if not os.path.exists(self.destdir):
                 os.makedirs(self.destdir, 0700)
+
+            self.mappings = config[u'mappings']
+
         except IOError, e:
             if e.errno == errno.ENOENT:
                 self.sourcedirs = CRConfiguration.defaultconfig[u'sourcedirs']
                 self.destdir = CRConfiguration.defaultconfig[u'destdir']
+                self.mappings = CRConfiguration.defaultconfig[u'mappings']
                 self.storeconfig()
             else:
                 raise
@@ -75,7 +82,8 @@ class CRConfiguration(QDialog):
             json.dump(CRConfiguration.defaultconfig, fp, indent=1)
         else:
             config = {u'sourcedirs': list(self.sourcedirs), 
-                      u'destdir': self.destdir}
+                      u'destdir': self.destdir,
+                      u'mappings': self.mappings}
             json.dump(config, fp, indent=1)
         
         fp.close()
@@ -97,6 +105,22 @@ class CRConfiguration(QDialog):
         
     def getdestination(self):
         return self.destdir
+
+    def getmapping(self, key):
+        if not self.mappings.has_key(key):
+            return None
+        return self.mappings[key]
+       
+    def setmapping(self, key, value):
+        self.mappings[key] = value
+
+    def setmappingbymap(self, mappings):
+        self.mappings = mappings
     
+    def getallmappings(self):
+        return self.mappings
+    
+
     def __str__(self):
         return `self.sourcedirs, self.destdir`
+

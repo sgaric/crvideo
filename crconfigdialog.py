@@ -1,3 +1,4 @@
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 ####################################################################
 #    
 #    CRVIDEO Application - Find and copy mp4 and mkv files hidden in private folders
